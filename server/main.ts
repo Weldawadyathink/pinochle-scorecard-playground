@@ -1,9 +1,35 @@
-import { Hono } from 'hono'
+import { Context, Hono } from "hono";
+import { generate } from "./nameGenerator.ts";
 
-const app = new Hono()
+const expiration = 604800000; // one week in ms
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+const app = new Hono({ strict: false });
 
-Deno.serve(app.fetch)
+app.get("/", (c: Context) => {
+  return c.text("Hello Hono!");
+});
+
+app.get("/v1/game/new", async (c: Context) => {
+  const kv = await Deno.openKv();
+
+  async function getName() {
+    const possibleName = generate();
+    console.log(`Generated name ${possibleName}, testing for collisions.`);
+    const result = await kv.get(["gameName", possibleName]);
+    if (result.versionstamp !== null) {
+      console.log("Name collision, generating new name.");
+      return getName();
+    }
+    return possibleName;
+  }
+
+  const name = await getName();
+
+  // await kv.set(["gameName", name], "test", {
+  //   expireIn: expiration,
+  // });
+
+  return c.json({ name: name });
+});
+
+Deno.serve(app.fetch);

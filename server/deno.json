@@ -3,10 +3,15 @@
     "hono": "jsr:@hono/hono@^4.4.13"
   },
   "tasks": {
-    "start": "deno run --allow-net main.ts"
+    "start": "deno run --watch --allow-net --unstable-kv main.ts"
   },
   "compilerOptions": {
     "jsx": "precompile",
     "jsxImportSource": "hono/jsx"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-explicit-any"]
+    }
   }
 }

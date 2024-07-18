@@ -2,11 +2,30 @@
   "version": "3",
   "packages": {
     "specifiers": {
-      "jsr:@hono/hono@^4.4.13": "jsr:@hono/hono@4.4.13"
+      "jsr:@hono/hono@^4.4.13": "jsr:@hono/hono@4.4.13",
+      "npm:project-namer": "npm:project-namer@1.0.0",
+      "npm:project-namer@1.0.0": "npm:project-namer@1.0.0"
     },
     "jsr": {
       "@hono/hono@4.4.13": {
         "integrity": "bd8a736b7e77c6d285c186beb37526fcb0497f48b759d508e595464b5f2ffd5c"
+      }
+    },
+    "npm": {
+      "commander@6.2.1": {
+        "integrity": "sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==",
+        "dependencies": {}
+      },
+      "lodash@4.17.21": {
+        "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==",
+        "dependencies": {}
+      },
+      "project-namer@1.0.0": {
+        "integrity": "sha512-BlbI2+W4VHhC3HWCvIzyqIxMbKLT6grN3ZMSVfznvZcs6gpcHtVAcvxL//NQE90aQWJg/3NuPXuGTAQxaZrBxw==",
+        "dependencies": {
+          "commander": "commander@6.2.1",
+          "lodash": "lodash@4.17.21"
+        }
       }
     }
   },
