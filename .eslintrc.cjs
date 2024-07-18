@@ -16,4 +16,5 @@ module.exports = {
       { allowConstantExport: true },
     ],
   },
+  ignores: ["./server/"],
 };

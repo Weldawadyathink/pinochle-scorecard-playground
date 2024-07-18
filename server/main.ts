@@ -1,5 +1,6 @@
 import { Context, Hono } from "hono";
 import { generate } from "./nameGenerator.ts";
+import { upgradeWebSocket } from "hono/deno";
 
 const expiration = 604800000; // one week in ms
 
@@ -31,5 +32,39 @@ app.get("/v1/game/new", async (c: Context) => {
 
   return c.json({ name: name });
 });
+
+app.all(
+  "/v1/game/connect/:name",
+  upgradeWebSocket(async (c: Context) => {
+    const gameName = c.req.param("name");
+    const kv = await Deno.openKv();
+    return {
+      onOpen: async (_evt, ws) => {
+        console.log(`Connected to websocket for game: ${gameName}`);
+
+        const gameState = await kv.get(["gameName", gameName]);
+        if (gameState.versionstamp != null) {
+          ws.send(JSON.stringify(gameState.value));
+        }
+
+        const stream = kv.watch([["gameName", gameName]]);
+        for await (const [entry] of stream) {
+          ws.send(JSON.stringify(entry.value));
+          console.log(JSON.stringify(entry.value));
+        }
+      },
+
+      onMessage: (evt, _ws) => {
+        console.log("Received WS message", evt);
+        const data = JSON.parse(evt.data.toString());
+        kv.set(["gameName", gameName], data, { expireIn: expiration });
+      },
+
+      onClose: () => console.log("Disconnected"),
+
+      onError: (error) => console.error("Error: ", error),
+    };
+  })
+);
 
 Deno.serve(app.fetch);
