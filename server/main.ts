@@ -20,6 +20,15 @@ app.use(
   })
 );
 
+app.use(
+  "/v1/game/status/*",
+  cors({
+    origin: "https://pinochle.spenserbushey.com",
+    allowMethods: ["GET", "OPTIONS"],
+    exposeHeaders: ["Content-Length"],
+  })
+);
+
 app.get("/v1/game/new", async (c: Context) => {
   const kv = await Deno.openKv();
 
@@ -27,7 +36,7 @@ app.get("/v1/game/new", async (c: Context) => {
     const possibleName = generate();
     console.log(`Generated name ${possibleName}, testing for collisions.`);
     const result = await kv.get(["gameName", possibleName]);
-    if (result.versionstamp !== null) {
+    if (result.versionstamp != null) {
       console.log("Name collision, generating new name.");
       return getName();
     }
@@ -36,11 +45,22 @@ app.get("/v1/game/new", async (c: Context) => {
 
   const name = await getName();
 
-  // await kv.set(["gameName", name], "test", {
-  //   expireIn: expiration,
-  // });
-
   return c.json({ name: name });
+});
+
+app.get("v1/game/status/:name", async (c: Context) => {
+  const gameName = c.req.param("name");
+  const kv = await Deno.openKv();
+
+  const result = await kv.get(["gameName", gameName]);
+  if (result.versionstamp == null) {
+    // game does not exists
+    c.status(404);
+    return c.text("Game name not found");
+  } else {
+    // game exists
+    return c.json(JSON.parse(result.value as any));
+  }
 });
 
 app.all(

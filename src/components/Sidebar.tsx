@@ -42,7 +42,7 @@ function ConnectToGame({ onSetGameName, children }: ConnectToGameProps) {
         : "https://api.pinochle.spenserbushey.com";
     const api = fetcher({ base: apiUrl });
     api
-      .get(`/v1/game/connect/${name}`)
+      .get(`/v1/game/status/${name}`)
       .then(() => {
         onSetGameName(name);
         setOpen(false);
