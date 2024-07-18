@@ -1,4 +1,5 @@
 import { Context, Hono } from "hono";
+import { cors } from "hono/cors";
 import { generate } from "./nameGenerator.ts";
 import { upgradeWebSocket } from "hono/deno";
 
@@ -9,6 +10,15 @@ const app = new Hono({ strict: false });
 app.get("/", (c: Context) => {
   return c.text("Hello Hono!");
 });
+
+app.use(
+  "/v1/game/new",
+  cors({
+    origin: "https://pinochle.spenserbushey.com",
+    allowMethods: ["GET", "OPTIONS"],
+    exposeHeaders: ["Content-Length"],
+  })
+);
 
 app.get("/v1/game/new", async (c: Context) => {
   const kv = await Deno.openKv();
