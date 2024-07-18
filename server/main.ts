@@ -42,10 +42,11 @@ app.all(
       onOpen: async (_evt, ws) => {
         console.log(`Connected to websocket for game: ${gameName}`);
 
-        const gameState = await kv.get(["gameName", gameName]);
-        if (gameState.versionstamp != null) {
-          ws.send(JSON.stringify(gameState.value));
-        }
+        // KV watch already sends first game state
+        // const gameState = await kv.get(["gameName", gameName]);
+        // if (gameState.versionstamp != null) {
+        //   ws.send(JSON.stringify(gameState.value));
+        // }
 
         const stream = kv.watch([["gameName", gameName]]);
         for await (const [entry] of stream) {
